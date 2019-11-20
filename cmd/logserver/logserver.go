@@ -14,6 +14,13 @@ import (
 var counter int64
 
 func main() {
+
+	for _, pair := range os.Environ() {
+		log.Printf(pair)
+	}
+
+	log.Printf("")
+
 	addr := flag.String("a", ":2000", "listen address")
 	flag.Parse()
 
