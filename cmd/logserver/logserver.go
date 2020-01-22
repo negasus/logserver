@@ -43,6 +43,9 @@ func main() {
 }
 
 func handler(ctx *fasthttp.RequestCtx) {
+	ctx.Response.Header.Add("Access-Control-Allow-Origin", "*")
+	ctx.Response.Header.Add("Access-Control-Allow-Methods", "*")
+	ctx.Response.Header.Add("Access-Control-Allow-Headers", "*")
 
 	c := atomic.AddInt64(&counter, 1)
 
