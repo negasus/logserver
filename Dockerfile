@@ -1,10 +1,11 @@
-FROM golang:1.12 AS build
+FROM golang:1.13 AS build
 
 ENV CGO_ENABLED=0
 ENV GOOS=linux
 ENV GOARCH=amd64
+ENV GOFLAGS="-mod=vendor"
 
-WORKDIR /go/src/github.com/negasus/logserver
+WORKDIR /build/logserver
 
 ADD . .
 
