@@ -8,6 +8,12 @@ You can redefine listen address by console argument `-a` or env variable `LISTEN
 
 ## changelog
 
+### v1.0.2
+
+- add CORS headers
+
+### v1.0.1
+
 ### v1.0.0
 
 - initial version
