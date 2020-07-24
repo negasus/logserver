@@ -11,16 +11,16 @@ Default listen address `:2000`
  
 ## Usage
 
-`
+```
 docker run -d -p 2000:2000 negasus/logserver
 
 curl 127.0.0.1:2000
 curl 127.0.0.1:2000/foo?bar=baz
-`
+```
 
 output
 
-`
+```
 ----------[ 1 ]----------
 2020-07-24 15:38:01.7058463 +0000 UTC m=+2.385672601
 [172.17.0.1:41132] GET /
@@ -40,7 +40,7 @@ Content-Length: 0
 User-Agent: curl/7.64.1
 Accept: */*
 
-`
+```
 
 ## changelog
 
