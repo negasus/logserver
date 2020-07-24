@@ -12,6 +12,9 @@ import (
 )
 
 var counter int64
+var version = "undefined"
+var body = flag.String("b", "", "response body")
+var addr = flag.String("a", ":2000", "listen address")
 
 func main() {
 
@@ -21,14 +24,16 @@ func main() {
 
 	log.Printf("")
 
-	addr := flag.String("a", ":2000", "listen address")
 	flag.Parse()
 
 	if addrEnv := os.Getenv("LISTEN_ADDR"); addrEnv != "" {
 		*addr = addrEnv
 	}
+	if bodyEnv := os.Getenv("RESPONSE_BODY"); bodyEnv != "" {
+		*body = bodyEnv
+	}
 
-	log.Printf("[INFO] listen %s", *addr)
+	log.Printf("[INFO] logserver.%s listen %s", version, *addr)
 
 	ln, err := net.Listen("tcp4", *addr)
 	if err != nil {
@@ -36,7 +41,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := fasthttp.Serve(ln, handler); err != nil {
+	server := &fasthttp.Server{
+		Name:    "logserver " + version,
+		Handler: handler,
+	}
+
+	if err := server.Serve(ln); err != nil {
 		log.Printf("[ERROR] error serve, %v", err)
 		os.Exit(1)
 	}
@@ -57,4 +67,8 @@ func handler(ctx *fasthttp.RequestCtx) {
 	})
 
 	fmt.Printf("\n%s\n", ctx.PostBody())
+
+	if *body != "" {
+		ctx.Response.SetBodyString(*body)
+	}
 }

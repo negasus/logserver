@@ -4,9 +4,18 @@ Simple service for logging all incoming requests
 
 Default listen address `:2000`
 
-You can redefine listen address by console argument `-a` or env variable `LISTEN_ADDR` 
+## Params
+
+- `-a` or env variable `LISTEN_ADDR` for define listen address
+- `-b` or env variable `RESPONSE_BODY` for define response body
+ 
 
 ## changelog
+
+### v1.0.3
+
+- add response body
+- output application version on start
 
 ### v1.0.2
 

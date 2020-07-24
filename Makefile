@@ -4,7 +4,7 @@ TAG := $(shell git describe --tag)
 
 build:
 	@echo Build $(TAG)
-	docker build -t negasus/logserver:$(TAG) -f Dockerfile .
+	docker build --build-arg version=$(TAG) -t negasus/logserver:$(TAG) -f Dockerfile .
 push:
 	@echo Push $(TAG)
 	docker push negasus/logserver:$(TAG)

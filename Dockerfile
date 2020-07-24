@@ -1,15 +1,17 @@
-FROM golang:1.13 AS build
+FROM golang:1.14 AS build
 
 ENV CGO_ENABLED=0
 ENV GOOS=linux
 ENV GOARCH=amd64
 ENV GOFLAGS="-mod=vendor"
 
+ARG version="undefined"
+
 WORKDIR /build/logserver
 
 ADD . .
 
-RUN go build -o /logserver ./cmd/logserver
+RUN go build -o /logserver -ldflags "-X main.version=${version} -s -w" ./cmd/logserver
 
 FROM scratch
 COPY --from=build /logserver /logserver
