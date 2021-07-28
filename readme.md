@@ -8,6 +8,8 @@ Simple service for logging all incoming requests
 - `-b` or env variable `RESPONSE_BODY` for define response body (default: `empty`)
 - `-c` or env variable `RESPONSE_CODE` for define response status code (default: `200`)
  
+>  If you define the response body, `\n` will be replaced to new line separator, and `\t` will be replaced to `tab` 
+
 ## Usage
 
 ```bash
@@ -44,6 +46,10 @@ ___________[ 2 ]___________
 ```
 
 ## changelog
+
+### v1.0.5 (2021-07-28)
+
+- replace `\n` and `\t` in the response body
 
 ### v1.0.4
 
