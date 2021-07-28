@@ -13,6 +13,7 @@ import (
 	"os"
 	"os/signal"
 	"strconv"
+	"strings"
 	"sync/atomic"
 	"syscall"
 	"time"
@@ -65,6 +66,11 @@ func run() error {
 	for _, pair := range os.Environ() {
 		fmt.Printf("%s\n", pair)
 	}
+
+	opts.responseBody = strings.Replace(opts.responseBody, "\\t", "\t", -1)
+	opts.responseBody = strings.Replace(opts.responseBody, "\\n", "\n", -1)
+
+	fmt.Printf("----- Options -----\nListen addr:\n%s\nResonse body:\n%s\nResponse code:\n%d\n----------\n", opts.listenAddress, opts.responseBody, opts.responseCode)
 
 	fmt.Printf("logserver.%s listen %s\n", version, opts.listenAddress)
 
