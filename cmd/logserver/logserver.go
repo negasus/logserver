@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"log"
 	"net"
 	"net/http"
 	"os"
@@ -20,18 +21,20 @@ import (
 )
 
 var counter int64
-
+var out io.Writer = os.Stdout
 var version = "undefined"
 
 var opts struct {
 	listenAddress string
 	responseBody  string
+	contentType   string
 	responseCode  int
 }
 
 func main() {
 	flag.StringVar(&opts.listenAddress, "a", ":2000", "listen address")
 	flag.StringVar(&opts.responseBody, "b", "", "response body")
+	flag.StringVar(&opts.contentType, "t", "text/plain; charset=utf-8", "content type header value")
 	flag.IntVar(&opts.responseCode, "c", http.StatusOK, "response status code")
 
 	flag.Parse()
@@ -41,6 +44,9 @@ func main() {
 	}
 	if bodyEnv := os.Getenv("RESPONSE_BODY"); bodyEnv != "" {
 		opts.responseBody = bodyEnv
+	}
+	if contentTypeEnv := os.Getenv("CONTENT_TYPE"); contentTypeEnv != "" {
+		opts.contentType = contentTypeEnv
 	}
 	if responseCodeEnv := os.Getenv("RESPONSE_CODE"); responseCodeEnv != "" {
 		responseCodeEnvInt, errInt := strconv.Atoi(responseCodeEnv)
@@ -150,10 +156,21 @@ func response(rw http.ResponseWriter, err error) {
 		fmt.Printf("[ERROR] %s\n", err)
 	}
 
+	rw.Header().Set("Content-Type", opts.contentType)
 	rw.WriteHeader(opts.responseCode)
 
 	if opts.responseBody != "" {
-		_, errWrite := rw.Write([]byte(opts.responseBody))
+		body := []byte(opts.responseBody)
+		if strings.HasPrefix(opts.responseBody, "file://") {
+			var errReadBody error
+			body, errReadBody = os.ReadFile(strings.TrimPrefix(opts.responseBody, "file://"))
+			if errReadBody != nil {
+				log.Printf("error read response body file %s, %v", opts.responseBody, errReadBody)
+				return
+			}
+		}
+
+		_, errWrite := rw.Write(body)
 		if errWrite != nil {
 			fmt.Printf("[ERROR] error write response, %d", errWrite)
 		}
