@@ -7,8 +7,19 @@ Simple service for logging all incoming requests
 - `-a` or env variable `LISTEN_ADDR` for define listen address (default: `:2000`)
 - `-b` or env variable `RESPONSE_BODY` for define response body (default: `empty`)
 - `-c` or env variable `RESPONSE_CODE` for define response status code (default: `200`)
+- `-t` or env variable `CONTENT_TYPE` for define response content type header (default: `text/plain; charset=utf-8`)
  
 >  If you define the response body, `\n` will be replaced to new line separator, and `\t` will be replaced to `tab` 
+
+You can to specify filename for response body. You should define response body as `file://<filename_path>`
+
+Example:
+
+```
+# use /home/user/demo.json for response body
+
+$ logserver -b file:///home/user/demo.json
+```
 
 ## Usage
 
@@ -46,6 +57,12 @@ ___________[ 2 ]___________
 ```
 
 ## changelog
+
+### v1.0.6 (2021-10-09)
+
+- add `content-type` options
+- use file for response body
+- go 1.17
 
 ### v1.0.5 (2021-07-28)
 
