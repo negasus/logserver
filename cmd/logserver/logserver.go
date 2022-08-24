@@ -118,7 +118,7 @@ func handler(rw http.ResponseWriter, req *http.Request) {
 	fmt.Printf("|  [%s] %s %s\n|  \n", req.RemoteAddr, req.Method, req.RequestURI)
 
 	for key, values := range req.Header {
-		fmt.Printf("|  %s: %v\n", key, values)
+		fmt.Printf("|  %s: %#v\n", key, values)
 	}
 
 	defer req.Body.Close()
