@@ -58,6 +58,10 @@ ___________[ 2 ]___________
 
 ## changelog
 
+### v1.0.7 (2022-08-24)
+
+- print headers as "%#v" for convenience parsing multiple headers
+
 ### v1.0.6 (2021-10-09)
 
 - add `content-type` options
