@@ -28,14 +28,16 @@ var opts struct {
 	listenAddress string
 	responseBody  string
 	contentType   string
+	fsPath        string
 	responseCode  int
 }
 
 func main() {
 	flag.StringVar(&opts.listenAddress, "a", ":2000", "listen address")
 	flag.StringVar(&opts.responseBody, "b", "", "response body")
-	flag.StringVar(&opts.contentType, "t", "text/plain; charset=utf-8", "content type header value")
-	flag.IntVar(&opts.responseCode, "c", http.StatusOK, "response status code")
+	flag.StringVar(&opts.contentType, "t", "", "content type header value")
+	flag.StringVar(&opts.fsPath, "f", "", "run as file server with specified root directory")
+	flag.IntVar(&opts.responseCode, "c", 0, "response status code")
 
 	flag.Parse()
 
@@ -52,14 +54,25 @@ func main() {
 		responseCodeEnvInt, errInt := strconv.Atoi(responseCodeEnv)
 		if errInt != nil {
 			fmt.Printf("response code must be an interger")
-			return
+			os.Exit(1)
 		}
 		opts.responseCode = responseCodeEnvInt
+	}
+
+	if opts.responseCode != 0 && (opts.responseCode < 100 || opts.responseCode > 999) {
+		fmt.Printf("response code must be in range 100..999 or 0 for default 200")
+		os.Exit(1)
+	}
+
+	if opts.fsPath != "" && (opts.responseBody != "" || opts.responseCode != 0 || opts.contentType != "") {
+		fmt.Printf("error: -f and -b/-c/-t options are mutually exclusive\n")
+		os.Exit(1)
 	}
 
 	err := run()
 	if err != nil {
 		fmt.Printf("error run logserver, %s\n", err)
+		os.Exit(1)
 	}
 
 	fmt.Printf("\ndone\n")
@@ -86,8 +99,18 @@ func run() error {
 	}
 	defer ln.Close()
 
+	var h http.Handler
+
+	h = middlewarePrintRequest(http.HandlerFunc(handler))
+
+	if opts.fsPath != "" {
+		fmt.Printf("run as FileServer with path: %s\n", opts.fsPath)
+		fs := middlewarePrintRequest(http.FileServer(http.Dir("./static")))
+		h = fs
+	}
+
 	server := &http.Server{
-		Handler: http.HandlerFunc(handler),
+		Handler: h,
 	}
 
 	go func() {
@@ -106,21 +129,26 @@ func run() error {
 	return nil
 }
 
+func middlewarePrintRequest(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		rw.Header().Add("Access-Control-Allow-Origin", "*")
+		rw.Header().Add("Access-Control-Allow-Methods", "*")
+		rw.Header().Add("Access-Control-Allow-Headers", "*")
+
+		c := atomic.AddInt64(&counter, 1)
+
+		fmt.Printf("___________[ %d ]___________\n", c)
+		fmt.Printf("|  %v\n", time.Now())
+		fmt.Printf("|  [%s] %s %s\n|  \n", req.RemoteAddr, req.Method, req.RequestURI)
+
+		for key, values := range req.Header {
+			fmt.Printf("|  %s: %#v\n", key, values)
+		}
+		next.ServeHTTP(rw, req)
+	})
+}
+
 func handler(rw http.ResponseWriter, req *http.Request) {
-	rw.Header().Add("Access-Control-Allow-Origin", "*")
-	rw.Header().Add("Access-Control-Allow-Methods", "*")
-	rw.Header().Add("Access-Control-Allow-Headers", "*")
-
-	c := atomic.AddInt64(&counter, 1)
-
-	fmt.Printf("___________[ %d ]___________\n", c)
-	fmt.Printf("|  %v\n", time.Now())
-	fmt.Printf("|  [%s] %s %s\n|  \n", req.RemoteAddr, req.Method, req.RequestURI)
-
-	for key, values := range req.Header {
-		fmt.Printf("|  %s: %#v\n", key, values)
-	}
-
 	defer req.Body.Close()
 
 	requestBody, err := io.ReadAll(req.Body)
@@ -154,10 +182,15 @@ func handler(rw http.ResponseWriter, req *http.Request) {
 func response(rw http.ResponseWriter, err error) {
 	if err != nil {
 		fmt.Printf("[ERROR] %s\n", err)
+		return
 	}
 
-	rw.Header().Set("Content-Type", opts.contentType)
-	rw.WriteHeader(opts.responseCode)
+	if opts.contentType != "" {
+		rw.Header().Set("Content-Type", opts.contentType)
+	}
+	if opts.responseCode != 0 {
+		rw.WriteHeader(opts.responseCode)
+	}
 
 	if opts.responseBody != "" {
 		body := []byte(opts.responseBody)

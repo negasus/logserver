@@ -1,4 +1,4 @@
-FROM golang:1.17 AS build
+FROM golang:1.21 AS build
 
 ENV CGO_ENABLED=0
 ENV GOOS=linux
@@ -11,7 +11,7 @@ WORKDIR /build/logserver
 
 ADD . .
 
-RUN go build -o /logserver -ldflags "-X main.version=${version} -s -w" ./cmd/logserver
+RUN go build -o /logserver -ldflags "-X main.version=${version} -s -w" .
 
 FROM scratch
 COPY --from=build /logserver /logserver

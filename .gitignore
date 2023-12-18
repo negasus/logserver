@@ -2,4 +2,4 @@
 .vscode
 .env*
 coverage.txt
-.debug
+var/
