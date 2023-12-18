@@ -50,6 +50,9 @@ func main() {
 	if contentTypeEnv := os.Getenv("CONTENT_TYPE"); contentTypeEnv != "" {
 		opts.contentType = contentTypeEnv
 	}
+	if fileServerEnv := os.Getenv("FILE_SERVER"); fileServerEnv != "" {
+		opts.fsPath = fileServerEnv
+	}
 	if responseCodeEnv := os.Getenv("RESPONSE_CODE"); responseCodeEnv != "" {
 		responseCodeEnvInt, errInt := strconv.Atoi(responseCodeEnv)
 		if errInt != nil {

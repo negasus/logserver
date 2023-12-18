@@ -2,16 +2,33 @@
 
 Simple service for logging all incoming requests
 
+## Install
+
+As binary
+
+```bash
+go install github.com/negasus/logserver@latest
+```
+
+Or you can use docker image
+
+```bash
+docker pull negasus/logserver
+```
+
 ## Params
 
 - `-a` or env variable `LISTEN_ADDR` for define listen address (default: `:2000`)
 - `-b` or env variable `RESPONSE_BODY` for define response body (default: `empty`)
 - `-c` or env variable `RESPONSE_CODE` for define response status code (default: `200`)
-- `-t` or env variable `CONTENT_TYPE` for define response content type header (default: `text/plain; charset=utf-8`)
+- `-t` or env variable `CONTENT_TYPE` for define response content type header (default: `empty`)
+- `-f` or env variable `FILE_SERVER` for define file server path (default: `empty`)
  
 >  If you define the response body, `\n` will be replaced to new line separator, and `\t` will be replaced to `tab` 
 
-You can to specify filename for response body. You should define response body as `file://<filename_path>`
+You can specify filename for response body. You should define response body as `file://<filename_path>`
+
+If you use `-f`, you should not use `-b`, `-c` and `-t` params
 
 Example:
 
