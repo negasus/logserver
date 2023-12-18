@@ -58,6 +58,10 @@ ___________[ 2 ]___________
 
 ## changelog
 
+### v1.1.0 (2023-12-18)
+
+- refactoring
+
 ### v1.0.7 (2022-08-24)
 
 - print headers as "%#v" for convenience parsing multiple headers
