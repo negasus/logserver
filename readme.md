@@ -75,6 +75,10 @@ ___________[ 2 ]___________
 
 ## changelog
 
+### v1.1.1 (2023-12-18)
+
+- add env for fileserver
+
 ### v1.1.0 (2023-12-18)
 
 - refactoring
