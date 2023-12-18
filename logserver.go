@@ -105,7 +105,7 @@ func run() error {
 
 	if opts.fsPath != "" {
 		fmt.Printf("run as FileServer with path: %s\n", opts.fsPath)
-		fs := middlewarePrintRequest(http.FileServer(http.Dir("./static")))
+		fs := middlewarePrintRequest(http.FileServer(http.Dir(opts.fsPath)))
 		h = fs
 	}
 
